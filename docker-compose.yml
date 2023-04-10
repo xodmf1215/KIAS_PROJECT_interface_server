@@ -1,39 +1,38 @@
-version: '3.9'
+version: '3'
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: interface-server
     ports:
-      - "3000:3000"
-    networks:
-      - my-network
-    #depends_on:
-    #  - mongo
-  mongo:
-    image: mongo
-    restart: always
+      - '80:80'
+
+  db:
+    image: mongo:latest
+    restart: always 
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_USERNAME: khaiadmin
       MONGO_INITDB_ROOT_PASSWORD: passwd
     volumes:
       - ./data:/data/db
     networks:
-      - my-network
+      - db-network
+
   mongo-express:
-    image: mongo-express
-    restart: always
+    image: mongo-express:latest
     ports:
-      - "8081:8081"
+      - '8081:8081'
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_SERVER: db
+      ME_CONFIG_MONGODB_ADMINUSERNAME: khaiadmin
       ME_CONFIG_MONGODB_ADMINPASSWORD: passwd
-      ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: admin
-    depends_on:
-      - mongo
+      ME_CONFIG_BASICAUTH_USERNAME: xodmf
+      ME_CONFIG_BASICAUTH_PASSWORD: passwd
     networks:
-      - my-network
+      - db-network
 
 networks:
-  my-network:
+  db-network:
+    driver: bridge
